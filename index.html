@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SpeachBeach</title>
+<meta name="description" content="SpeachBeach plays your voice back through headphones with a short delay and optional pitch shift: a practice tool for people who stutter.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/app-icon.png">
+<meta property="og:title" content="SpeachBeach">
+<meta property="og:description" content="Hear your voice a beat later. Delayed and frequency-altered auditory feedback for iPhone and iPad.">
+<meta property="og:image" content="https://gnium.github.io/speachbeach/assets/app-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --ground: #F3F9FA;
+    --surface: #FFFFFF;
+    --ink: #0A2338;
+    --muted: #4B6778;
+    --line: #D3E6EB;
+    --accent: #0D57A3;
+    --accent-ink: #FFFFFF;
+    --turquoise: #2BC4D3;
+    --sun: #FFD166;
+    --sky-top: #2BC4D3;
+    --sea-bottom: #0D57A3;
+    --chip: #E2F3F6;
+    --focus: #FFB020;
+    --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --measure: 64ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #05182A;
+      --surface: #0A2437;
+      --ink: #E3F2F6;
+      --muted: #97B3C2;
+      --line: #183B52;
+      --accent: #5FD3DF;
+      --accent-ink: #05182A;
+      --sky-top: #127C96;
+      --sea-bottom: #062F5C;
+      --chip: #0F3148;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #05182A;
+    --surface: #0A2437;
+    --ink: #E3F2F6;
+    --muted: #97B3C2;
+    --line: #183B52;
+    --accent: #5FD3DF;
+    --accent-ink: #05182A;
+    --sky-top: #127C96;
+    --sea-bottom: #062F5C;
+    --chip: #0F3148;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 1.0625rem/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.08; text-wrap: balance; margin: 0; }
+  h2 { font-size: clamp(1.9rem, 4vw, 2.75rem); font-weight: 800; letter-spacing: -0.02em; }
+  h3 { font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  .wrap { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: 20px; }
+  .eyebrow {
+    font: 500 0.78rem/1.3 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .mono { font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: absolute; inset: 0 0 auto 0; z-index: 2;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font: 800 1.2rem/1 var(--display); letter-spacing: -0.01em; }
+  .brand svg { width: 36px; height: 36px; border-radius: 9px; box-shadow: 0 2px 10px rgba(3, 30, 60, 0.25); }
+  .topnav { display: flex; align-items: center; gap: 20px; }
+  .topnav a { color: rgba(255,255,255,0.92); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+  .topnav a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+  .lang {
+    appearance: none; -webkit-appearance: none;
+    font: 700 0.9rem/1 var(--body); color: #fff;
+    background: rgba(255,255,255,0.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='white'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1px solid rgba(255,255,255,0.35); border-radius: 999px;
+    padding: 9px 30px 9px 14px; cursor: pointer;
+  }
+  .lang option { color: #0A2338; }
+  @media (max-width: 720px) { .topnav a { display: none; } }
+
+  /* ---------- Hero: sky to sea, the voice and its echo ---------- */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sea-bottom) 100%);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 104px);
+  }
+  .hero::before { /* the sun */
+    content: ""; position: absolute; right: max(6vw, 24px); top: 88px;
+    width: clamp(90px, 14vw, 170px); aspect-ratio: 1; border-radius: 50%;
+    background: var(--sun);
+    box-shadow: 0 0 0 clamp(22px, 3.4vw, 42px) rgba(255,255,255,0.16);
+  }
+  .hero-grid { position: relative; display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: end; padding-bottom: 120px; }
+  .hero h1 { font-size: clamp(2.5rem, 6.2vw, 4.6rem); font-weight: 800; letter-spacing: -0.035em; }
+  .hero .eyebrow { color: rgba(255,255,255,0.85); margin-bottom: 18px; }
+  .hero .lead { margin-top: 22px; font-size: 1.2rem; max-width: 36ch; color: rgba(255,255,255,0.93); }
+  .cta-row { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
+  .store {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #000; color: #fff; text-decoration: none;
+    border-radius: 14px; padding: 11px 22px 11px 18px;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 10px 30px rgba(2, 25, 55, 0.3);
+    transition: transform .15s ease;
+  }
+  .store:hover { transform: translateY(-2px); }
+  .store svg { width: 26px; height: 26px; flex: none; }
+  .store small { display: block; font-size: 0.72rem; line-height: 1.1; opacity: 0.85; }
+  .store strong { display: block; font: 600 1.2rem/1.15 var(--display); }
+  .cta-note { font-size: 0.95rem; color: rgba(255,255,255,0.85); }
+
+  .wave-card { position: relative; padding: 26px 24px 20px; border-radius: 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(6px); }
+  .wave { position: relative; height: 180px; }
+  .bars { position: absolute; inset: 0; display: flex; align-items: center; gap: 2.2%; }
+  .bars span {
+    flex: 1; height: var(--h); border-radius: 999px; background: #fff;
+    transform-origin: center; animation: talk 1.6s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  .bars.echo { transform: translateX(3.2%); }
+  .bars.echo span { opacity: 0.38; animation-delay: calc(var(--d) + 0.05s); }
+  @keyframes talk { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.62); } }
+  .ruler { margin-top: 14px; display: flex; justify-content: space-between; gap: 12px; color: rgba(255,255,255,0.85); font-size: 0.8rem; }
+  .ruler b { color: #fff; font-weight: 500; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.9); }
+  .legend i { display: inline-block; width: 22px; height: 8px; border-radius: 99px; background: #fff; vertical-align: middle; margin-right: 8px; }
+  .legend i.faint { opacity: 0.38; }
+  .shore { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 70px; display: block; }
+  .shore path { fill: var(--ground); }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; padding-bottom: 96px; }
+    .hero::before { top: 76px; }
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding-block: 88px; }
+  .section-head { display: grid; gap: 14px; max-width: var(--measure); margin-bottom: 44px; }
+  .section-head .eyebrow { color: var(--accent); }
+  .section-head p { color: var(--muted); font-size: 1.1rem; }
+
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .mode { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+  .mode .spec { align-self: flex-start; background: var(--chip); color: var(--ink); border-radius: 999px; padding: 5px 12px; font-size: 0.85rem; }
+  .mode p { color: var(--muted); }
+  .mode .tag { color: var(--accent); }
+  @media (max-width: 860px) { .modes { grid-template-columns: 1fr; } }
+
+  .benefits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 56px; border-top: 1px solid var(--line); }
+  .benefit { display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; padding-block: 24px; border-bottom: 1px solid var(--line); }
+  .benefit h3 { font-size: 1.2rem; }
+  .benefit .val { color: var(--accent); font-size: 0.95rem; text-align: right; white-space: nowrap; }
+  .benefit p { grid-column: 1 / -1; color: var(--muted); max-width: 52ch; }
+  @media (max-width: 760px) { .benefits { grid-template-columns: 1fr; } }
+
+  .audience { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .who { border-radius: 20px; padding: 30px; display: grid; gap: 12px; align-content: start; }
+  .who:first-child { background: var(--accent); color: var(--accent-ink); }
+  .who:last-child { background: var(--surface); border: 1px solid var(--line); }
+  .who:last-child p { color: var(--muted); }
+  @media (max-width: 760px) { .audience { grid-template-columns: 1fr; } }
+
+  .faq { max-width: 820px; display: grid; gap: 12px; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 0 22px; }
+  summary { cursor: pointer; list-style: none; padding-block: 20px; font: 600 1.15rem/1.3 var(--display); display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--mono); color: var(--accent); font-size: 1.3rem; line-height: 1; }
+  details[open] summary::after { content: "−"; }
+  details p { padding-bottom: 20px; color: var(--muted); max-width: var(--measure); }
+
+  .disclaimer { padding-block: 0 72px; }
+  .disclaimer p { border: 1px dashed var(--line); border-radius: 16px; padding: 18px 22px; color: var(--muted); font-size: 0.98rem; max-width: 820px; }
+  .disclaimer strong { color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); padding-block: 32px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; color: var(--muted); font-size: 0.95rem; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 20px; }
+  footer a { color: var(--ink); font-weight: 700; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .bars span { animation: none; }
+    .store { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="SpeachBeach">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" aria-hidden="true"><defs><linearGradient id="lbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2BC4D3"/><stop offset="1" stop-color="#0D57A3"/></linearGradient><clipPath id="lc"><rect width="1024" height="1024" rx="228"/></clipPath></defs><g clip-path="url(#lc)"><rect width="1024" height="1024" fill="url(#lbg)"/><circle cx="772" cy="250" r="168" fill="#FFFFFF" opacity="0.16"/><circle cx="772" cy="250" r="112" fill="#FFD166"/><path d="M0 830 C170 760 340 900 512 830 C684 760 854 900 1024 830 L1024 1024 L0 1024 Z" fill="#FFFFFF" opacity="0.16"/><g fill="#FFFFFF" opacity="0.35"><rect x="205" y="500" width="64" height="150" rx="32"/><rect x="303" y="425" width="64" height="300" rx="32"/><rect x="401" y="340" width="64" height="470" rx="32"/><rect x="499" y="395" width="64" height="360" rx="32"/><rect x="597" y="315" width="64" height="520" rx="32"/><rect x="695" y="435" width="64" height="280" rx="32"/><rect x="793" y="495" width="64" height="160" rx="32"/></g><g fill="#FFFFFF"><rect x="167" y="500" width="64" height="150" rx="32"/><rect x="265" y="425" width="64" height="300" rx="32"/><rect x="363" y="340" width="64" height="470" rx="32"/><rect x="461" y="395" width="64" height="360" rx="32"/><rect x="559" y="315" width="64" height="520" rx="32"/><rect x="657" y="435" width="64" height="280" rx="32"/><rect x="755" y="495" width="64" height="160" rx="32"/></g></g></svg>
+      SpeachBeach
+    </a>
+    <nav class="topnav" aria-label="Main">
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#benefits" data-i18n="nav.benefits">Benefits</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <select id="lang" class="lang" aria-label="Language">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="it">Italiano</option>
+      </select>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow" data-i18n="hero.eyebrow">Delayed &amp; frequency-altered auditory feedback</p>
+        <h1 data-i18n="hero.title">Hear your voice a beat later. Speak with more ease.</h1>
+        <p class="lead" data-i18n="hero.lead">SpeachBeach plays your voice back through your headphones with a short delay and an optional pitch shift. It's a practice tool that may help you speak more fluently.</p>
+        <div class="cta-row">
+          <!-- TODO: replace idXXXXXXXXXX with the real App Store ID once the app is live,
+               and swap this button for Apple's official "Download on the App Store" badge
+               (https://developer.apple.com/app-store/marketing/guidelines/). -->
+          <a class="store" href="https://apps.apple.com/app/idXXXXXXXXXX">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.7c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.33-3.52zM14.2 6.23c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.67-.92 2.66.97.07 1.96-.49 2.56-1.21z"/></svg>
+            <span><small data-i18n="hero.cta.small">Download on the</small><strong>App Store</strong></span>
+          </a>
+          <span class="cta-note" data-i18n="hero.note">For iPhone and iPad · Headphones required</span>
+        </div>
+      </div>
+
+      <figure class="wave-card" style="margin:0" aria-labelledby="wave-caption">
+        <div class="wave" aria-hidden="true">
+          <div class="bars echo">
+            <span style="--h:22%;--d:0s"></span><span style="--h:40%;--d:.1s"></span><span style="--h:64%;--d:.2s"></span><span style="--h:48%;--d:.3s"></span><span style="--h:82%;--d:.15s"></span><span style="--h:56%;--d:.35s"></span><span style="--h:34%;--d:.05s"></span><span style="--h:18%;--d:.25s"></span><span style="--h:38%;--d:.4s"></span><span style="--h:70%;--d:.12s"></span><span style="--h:92%;--d:.3s"></span><span style="--h:60%;--d:.22s"></span><span style="--h:44%;--d:.08s"></span><span style="--h:26%;--d:.33s"></span><span style="--h:14%;--d:.18s"></span>
+          </div>
+          <div class="bars">
+            <span style="--h:22%;--d:0s"></span><span style="--h:40%;--d:.1s"></span><span style="--h:64%;--d:.2s"></span><span style="--h:48%;--d:.3s"></span><span style="--h:82%;--d:.15s"></span><span style="--h:56%;--d:.35s"></span><span style="--h:34%;--d:.05s"></span><span style="--h:18%;--d:.25s"></span><span style="--h:38%;--d:.4s"></span><span style="--h:70%;--d:.12s"></span><span style="--h:92%;--d:.3s"></span><span style="--h:60%;--d:.22s"></span><span style="--h:44%;--d:.08s"></span><span style="--h:26%;--d:.33s"></span><span style="--h:14%;--d:.18s"></span>
+          </div>
+        </div>
+        <div class="ruler mono" aria-hidden="true"><span><b>0 ms</b></span><span>+50 ms</span><span>250 ms</span></div>
+        <figcaption id="wave-caption" class="legend">
+          <span><i></i><span data-i18n="hero.legend.voice">Your voice</span></span>
+          <span><i class="faint"></i><span data-i18n="hero.legend.echo">What you hear, 50 ms later</span></span>
+        </figcaption>
+      </figure>
+    </div>
+    <svg class="shore" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C240 0 480 70 720 36 C960 2 1200 64 1440 30 L1440 70 L0 70 Z"/></svg>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="how.eyebrow">How it works</p>
+        <h2 data-i18n="how.title">Three ways to shape what you hear</h2>
+        <p data-i18n="how.lead">Put on headphones, turn on feedback and start talking. Adjust the settings until speaking feels easier.</p>
+      </div>
+      <div class="modes">
+        <article class="mode">
+          <p class="eyebrow tag">DAF</p>
+          <h3 data-i18n="how.daf.t">Delayed feedback</h3>
+          <p data-i18n="how.daf.b">Your voice comes back a fraction of a second later. Many people who stutter find that a short delay slows their speech and makes it smoother.</p>
+          <span class="spec mono">0–250 ms</span>
+        </article>
+        <article class="mode">
+          <p class="eyebrow tag">FAF</p>
+          <h3 data-i18n="how.faf.t">Pitch shift</h3>
+          <p data-i18n="how.faf.b">Hear yourself slightly higher or lower, up to 12 semitones either way. Some speakers find a different-sounding voice easier to talk along with.</p>
+          <span class="spec mono">±1200 cents</span>
+        </article>
+        <article class="mode">
+          <p class="eyebrow tag" data-i18n="how.ad.tag">Adaptive</p>
+          <h3 data-i18n="how.ad.t">Adaptive mode</h3>
+          <p data-i18n="how.ad.b">The app listens for held sounds, repeated starts, blocks and fast speech, and raises the delay toward your maximum. While you speak fluently, it eases back to your minimum.</p>
+          <span class="spec mono" data-i18n="how.ad.spec">min ⇄ max</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="benefits" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="ben.eyebrow">Benefits</p>
+        <h2 data-i18n="ben.title">Made for everyday practice</h2>
+      </div>
+      <div class="benefits">
+        <div class="benefit">
+          <h3 data-i18n="ben.1.t">Practice anywhere</h3><span class="val mono" data-i18n="ben.1.v">iPhone · iPad</span>
+          <p data-i18n="ben.1.b">All you need is your phone and a pair of headphones.</p>
+        </div>
+        <div class="benefit">
+          <h3 data-i18n="ben.2.t">Very low latency</h3><span class="val mono">≈ 8 ms</span>
+          <p data-i18n="ben.2.b">About 8 ms of system overhead on a wired connection, so the delay you set is close to the delay you hear.</p>
+        </div>
+        <div class="benefit">
+          <h3 data-i18n="ben.3.t">Support that adapts</h3><span class="val mono" data-i18n="ben.3.v">auto</span>
+          <p data-i18n="ben.3.b">Adaptive mode adds delay when you need it and fades it out when you don't.</p>
+        </div>
+        <div class="benefit">
+          <h3 data-i18n="ben.4.t">Private by design</h3><span class="val mono" data-i18n="ben.4.v">on-device</span>
+          <p data-i18n="ben.4.b">Your voice is processed on your device. Nothing is recorded, stored or uploaded.</p>
+        </div>
+        <div class="benefit">
+          <h3 data-i18n="ben.5.t">No account, works offline</h3><span class="val mono" data-i18n="ben.5.v">0 sign-ups</span>
+          <p data-i18n="ben.5.b">Open the app and start. No sign-up and no internet connection needed.</p>
+        </div>
+        <div class="benefit">
+          <h3 data-i18n="ben.6.t">In your language</h3><span class="val mono">EN · ES · FR · IT</span>
+          <p data-i18n="ben.6.b">Available in English, Spanish, French and Italian.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="who" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="who.eyebrow">Who it's for</p>
+        <h2 data-i18n="who.title">For speakers, and the people who help them</h2>
+      </div>
+      <div class="audience">
+        <article class="who">
+          <h3 data-i18n="who.1.t">People who stutter</h3>
+          <p data-i18n="who.1.b">Read aloud, rehearse a presentation or warm up before a phone call, at your own pace and in private.</p>
+        </article>
+        <article class="who">
+          <h3 data-i18n="who.2.t">Speech-language pathologists</h3>
+          <p data-i18n="who.2.b">A simple practice tool to explore delay and pitch settings with clients, in session or as home practice.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="faq.eyebrow">FAQ</p>
+        <h2 data-i18n="faq.title">Good to know</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary data-i18n="faq.1.q">Do I need headphones?</summary>
+          <p data-i18n="faq.1.a">Yes. The app only starts when headphones are connected. Playing your voice through the speaker would cause acoustic feedback (howling), and the delayed sound should reach only your ears.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.2.q">Do Bluetooth headphones work?</summary>
+          <p data-i18n="faq.2.a">Yes, but Bluetooth adds around 100–250 ms of delay that the app can't remove, so what you hear arrives later than the delay you set. Wired headphones give the most accurate results.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.3.q">Is SpeachBeach a medical device?</summary>
+          <p data-i18n="faq.3.a">No. It's a practice tool, not a medical device. It doesn't diagnose, treat or cure stuttering, and results vary from person to person. For assessment and therapy, talk to a speech-language pathologist.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.4.q">Does it record my voice?</summary>
+          <p data-i18n="faq.4.a">No. Your voice is processed in real time on your device and is never recorded, saved or sent anywhere.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    <div class="wrap">
+      <p><strong data-i18n="disc.t">Please note:</strong> <span data-i18n="disc.b">SpeachBeach is not a medical device and does not replace a speech-language pathologist. Individual results vary.</span></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 SpeachBeach</span>
+    <nav aria-label="Footer">
+      <a href="privacy.html" data-i18n="foot.privacy">Privacy policy</a>
+      <!-- TODO: replace with the real support address before publishing. -->
+      <a href="mailto:hello@speachbeach.app" data-i18n="foot.contact">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var dict = {
+    es: {
+      "nav.how": "Cómo funciona", "nav.benefits": "Beneficios", "nav.faq": "Preguntas",
+      "hero.eyebrow": "Retroalimentación auditiva retardada y de frecuencia alterada",
+      "hero.title": "Escucha tu voz un instante después. Habla con más soltura.",
+      "hero.lead": "SpeachBeach te devuelve tu voz por los auriculares con un breve retardo y un cambio de tono opcional. Es una herramienta de práctica que puede ayudarte a hablar con más fluidez.",
+      "hero.cta.small": "Descárgalo en el",
+      "hero.note": "Para iPhone y iPad · Requiere auriculares",
+      "hero.legend.voice": "Tu voz", "hero.legend.echo": "Lo que oyes, 50 ms después",
+      "how.eyebrow": "Cómo funciona", "how.title": "Tres formas de ajustar lo que oyes",
+      "how.lead": "Ponte los auriculares, activa la retroalimentación y empieza a hablar. Ajusta los controles hasta que hablar te resulte más fácil.",
+      "how.daf.t": "Retroalimentación retardada",
+      "how.daf.b": "Tu voz vuelve una fracción de segundo más tarde. Muchas personas que tartamudean notan que un breve retardo hace su habla más pausada y fluida.",
+      "how.faf.t": "Cambio de tono",
+      "how.faf.b": "Escúchate un poco más agudo o más grave, hasta 12 semitonos en cada dirección. A algunas personas les resulta más fácil hablar acompañadas de una voz distinta.",
+      "how.ad.tag": "Adaptativo", "how.ad.t": "Modo adaptativo",
+      "how.ad.b": "La app detecta sonidos prolongados, inicios repetidos, bloqueos y habla rápida, y sube el retardo hacia tu máximo. Mientras hablas con fluidez, vuelve poco a poco a tu mínimo.",
+      "how.ad.spec": "mín ⇄ máx",
+      "ben.eyebrow": "Beneficios", "ben.title": "Pensada para practicar a diario",
+      "ben.1.t": "Practica en cualquier lugar", "ben.1.v": "iPhone · iPad", "ben.1.b": "Solo necesitas tu teléfono y unos auriculares.",
+      "ben.2.t": "Latencia muy baja", "ben.2.b": "Unos 8 ms de latencia del sistema con cable, así que el retardo que eliges es muy parecido al que oyes.",
+      "ben.3.t": "Apoyo que se adapta", "ben.3.v": "auto", "ben.3.b": "El modo adaptativo añade retardo cuando lo necesitas y lo reduce cuando no.",
+      "ben.4.t": "Privada por diseño", "ben.4.v": "en el dispositivo", "ben.4.b": "Tu voz se procesa en tu dispositivo. No se graba, no se guarda y no se sube a ningún sitio.",
+      "ben.5.t": "Sin cuenta y sin conexión", "ben.5.v": "0 registros", "ben.5.b": "Abre la app y empieza. Sin registro y sin necesidad de internet.",
+      "ben.6.t": "En tu idioma", "ben.6.b": "Disponible en inglés, español, francés e italiano.",
+      "who.eyebrow": "Para quién es", "who.title": "Para quienes hablan y para quienes les ayudan",
+      "who.1.t": "Personas que tartamudean", "who.1.b": "Lee en voz alta, ensaya una presentación o prepárate antes de una llamada, a tu ritmo y en privado.",
+      "who.2.t": "Logopedas y fonoaudiólogos", "who.2.b": "Una herramienta sencilla para explorar ajustes de retardo y tono con pacientes, en sesión o como práctica en casa.",
+      "faq.eyebrow": "Preguntas", "faq.title": "Conviene saber",
+      "faq.1.q": "¿Necesito auriculares?", "faq.1.a": "Sí. La app solo se activa con auriculares conectados. Reproducir tu voz por el altavoz provocaría acoples, y el sonido retardado debe llegar solo a tus oídos.",
+      "faq.2.q": "¿Funcionan los auriculares Bluetooth?", "faq.2.a": "Sí, pero el Bluetooth añade unos 100–250 ms de retardo que la app no puede eliminar, así que oyes tu voz más tarde de lo que has configurado. Los auriculares con cable dan los resultados más precisos.",
+      "faq.3.q": "¿SpeachBeach es un dispositivo médico?", "faq.3.a": "No. Es una herramienta de práctica, no un dispositivo médico. No diagnostica, trata ni cura la tartamudez, y los resultados varían de una persona a otra. Para una evaluación o terapia, consulta a un logopeda o fonoaudiólogo.",
+      "faq.4.q": "¿Graba mi voz?", "faq.4.a": "No. Tu voz se procesa en tiempo real en tu dispositivo y nunca se graba, se guarda ni se envía a ningún sitio.",
+      "disc.t": "Importante:", "disc.b": "SpeachBeach no es un dispositivo médico y no sustituye a un logopeda o fonoaudiólogo. Los resultados varían según la persona.",
+      "foot.privacy": "Política de privacidad", "foot.contact": "Contacto"
+    },
+    fr: {
+      "nav.how": "Fonctionnement", "nav.benefits": "Avantages", "nav.faq": "Questions",
+      "hero.eyebrow": "Retour auditif différé et à fréquence modifiée",
+      "hero.title": "Entendez votre voix un instant plus tard. Parlez plus librement.",
+      "hero.lead": "SpeachBeach vous renvoie votre voix dans les écouteurs avec un léger délai et un décalage de hauteur facultatif. C’est un outil d’entraînement qui peut vous aider à parler avec plus de fluidité.",
+      "hero.cta.small": "Télécharger dans l’",
+      "hero.note": "Pour iPhone et iPad · Écouteurs requis",
+      "hero.legend.voice": "Votre voix", "hero.legend.echo": "Ce que vous entendez, 50 ms plus tard",
+      "how.eyebrow": "Fonctionnement", "how.title": "Trois façons de modeler ce que vous entendez",
+      "how.lead": "Mettez vos écouteurs, activez le retour auditif et commencez à parler. Ajustez les réglages jusqu’à ce que parler devienne plus facile.",
+      "how.daf.t": "Retour différé",
+      "how.daf.b": "Votre voix revient une fraction de seconde plus tard. Beaucoup de personnes qui bégaient constatent qu’un léger délai ralentit leur débit et le rend plus fluide.",
+      "how.faf.t": "Décalage de hauteur",
+      "how.faf.b": "Entendez-vous un peu plus aigu ou plus grave, jusqu’à 12 demi-tons dans chaque sens. Certaines personnes trouvent plus facile de parler avec une voix qui sonne différemment.",
+      "how.ad.tag": "Adaptatif", "how.ad.t": "Mode adaptatif",
+      "how.ad.b": "L’app repère les sons prolongés, les débuts répétés, les blocages et la parole rapide, puis augmente le délai vers votre maximum. Quand vous parlez avec fluidité, il revient progressivement à votre minimum.",
+      "how.ad.spec": "min ⇄ max",
+      "ben.eyebrow": "Avantages", "ben.title": "Conçue pour s’entraîner au quotidien",
+      "ben.1.t": "Entraînez-vous partout", "ben.1.v": "iPhone · iPad", "ben.1.b": "Il vous suffit de votre téléphone et d’une paire d’écouteurs.",
+      "ben.2.t": "Latence très faible", "ben.2.b": "Environ 8 ms de latence système en filaire : le délai que vous réglez est très proche de celui que vous entendez.",
+      "ben.3.t": "Une aide qui s’adapte", "ben.3.v": "auto", "ben.3.b": "Le mode adaptatif ajoute du délai quand vous en avez besoin et le retire quand ce n’est plus le cas.",
+      "ben.4.t": "Confidentielle par conception", "ben.4.v": "sur l’appareil", "ben.4.b": "Votre voix est traitée sur votre appareil. Rien n’est enregistré, conservé ni envoyé.",
+      "ben.5.t": "Sans compte, hors ligne", "ben.5.v": "0 inscription", "ben.5.b": "Ouvrez l’app et commencez. Pas d’inscription ni de connexion internet nécessaire.",
+      "ben.6.t": "Dans votre langue", "ben.6.b": "Disponible en anglais, espagnol, français et italien.",
+      "who.eyebrow": "Pour qui", "who.title": "Pour celles et ceux qui parlent, et pour ceux qui les accompagnent",
+      "who.1.t": "Personnes qui bégaient", "who.1.b": "Lisez à voix haute, répétez une présentation ou échauffez-vous avant un appel, à votre rythme et en privé.",
+      "who.2.t": "Orthophonistes", "who.2.b": "Un outil simple pour explorer les réglages de délai et de hauteur avec vos patients, en séance ou pour l’entraînement à la maison.",
+      "faq.eyebrow": "Questions", "faq.title": "Bon à savoir",
+      "faq.1.q": "Ai-je besoin d’écouteurs ?", "faq.1.a": "Oui. L’app ne démarre que si des écouteurs sont branchés. Diffuser votre voix sur le haut-parleur provoquerait un effet Larsen, et le son différé ne doit parvenir qu’à vos oreilles.",
+      "faq.2.q": "Les écouteurs Bluetooth fonctionnent-ils ?", "faq.2.a": "Oui, mais le Bluetooth ajoute environ 100 à 250 ms de délai que l’app ne peut pas supprimer : vous entendez votre voix plus tard que le délai réglé. Les écouteurs filaires donnent les résultats les plus précis.",
+      "faq.3.q": "SpeachBeach est-il un dispositif médical ?", "faq.3.a": "Non. C’est un outil d’entraînement, pas un dispositif médical. Il ne diagnostique, ne traite ni ne guérit le bégaiement, et les résultats varient d’une personne à l’autre. Pour un bilan ou une rééducation, consultez un orthophoniste.",
+      "faq.4.q": "L’app enregistre-t-elle ma voix ?", "faq.4.a": "Non. Votre voix est traitée en temps réel sur votre appareil et n’est jamais enregistrée, conservée ni envoyée.",
+      "disc.t": "À noter :", "disc.b": "SpeachBeach n’est pas un dispositif médical et ne remplace pas un orthophoniste. Les résultats varient selon les personnes.",
+      "foot.privacy": "Politique de confidentialité", "foot.contact": "Contact"
+    },
+    it: {
+      "nav.how": "Come funziona", "nav.benefits": "Vantaggi", "nav.faq": "Domande",
+      "hero.eyebrow": "Feedback uditivo ritardato e a frequenza alterata",
+      "hero.title": "Ascolta la tua voce un istante dopo. Parla con più scioltezza.",
+      "hero.lead": "SpeachBeach ti restituisce la voce in cuffia con un breve ritardo e un cambio di tonalità opzionale. È uno strumento di esercizio che può aiutarti a parlare in modo più fluente.",
+      "hero.cta.small": "Scarica su",
+      "hero.note": "Per iPhone e iPad · Cuffie necessarie",
+      "hero.legend.voice": "La tua voce", "hero.legend.echo": "Ciò che senti, 50 ms dopo",
+      "how.eyebrow": "Come funziona", "how.title": "Tre modi per modellare ciò che senti",
+      "how.lead": "Indossa le cuffie, attiva il feedback e inizia a parlare. Regola le impostazioni finché parlare non ti viene più facile.",
+      "how.daf.t": "Feedback ritardato",
+      "how.daf.b": "La tua voce torna una frazione di secondo dopo. Molte persone che balbettano notano che un breve ritardo rende il loro eloquio più lento e scorrevole.",
+      "how.faf.t": "Cambio di tonalità",
+      "how.faf.b": "Senti la tua voce un po’ più acuta o più grave, fino a 12 semitoni in ogni direzione. Ad alcune persone risulta più facile parlare insieme a una voce diversa.",
+      "how.ad.tag": "Adattivo", "how.ad.t": "Modalità adattiva",
+      "how.ad.b": "L’app rileva suoni prolungati, attacchi ripetuti, blocchi ed eloquio rapido, e alza il ritardo verso il tuo massimo. Mentre parli in modo fluente, torna gradualmente al tuo minimo.",
+      "how.ad.spec": "min ⇄ max",
+      "ben.eyebrow": "Vantaggi", "ben.title": "Pensata per l’esercizio quotidiano",
+      "ben.1.t": "Esercitati ovunque", "ben.1.v": "iPhone · iPad", "ben.1.b": "Ti bastano il telefono e un paio di cuffie.",
+      "ben.2.t": "Latenza bassissima", "ben.2.b": "Circa 8 ms di latenza di sistema con il filo: il ritardo che imposti è molto vicino a quello che senti.",
+      "ben.3.t": "Un aiuto che si adatta", "ben.3.v": "auto", "ben.3.b": "La modalità adattiva aggiunge ritardo quando ne hai bisogno e lo riduce quando non serve.",
+      "ben.4.t": "Privata per scelta", "ben.4.v": "sul dispositivo", "ben.4.b": "La tua voce viene elaborata sul dispositivo. Nulla viene registrato, salvato o caricato.",
+      "ben.5.t": "Nessun account, funziona offline", "ben.5.v": "0 registrazioni", "ben.5.b": "Apri l’app e inizia. Nessuna registrazione e nessuna connessione internet necessaria.",
+      "ben.6.t": "Nella tua lingua", "ben.6.b": "Disponibile in inglese, spagnolo, francese e italiano.",
+      "who.eyebrow": "Per chi è", "who.title": "Per chi parla, e per chi lo aiuta",
+      "who.1.t": "Persone che balbettano", "who.1.b": "Leggi ad alta voce, prova una presentazione o scaldati prima di una telefonata, con i tuoi tempi e in privato.",
+      "who.2.t": "Logopedisti", "who.2.b": "Uno strumento semplice per esplorare impostazioni di ritardo e tonalità con i pazienti, in seduta o come esercizio a casa.",
+      "faq.eyebrow": "Domande", "faq.title": "Da sapere",
+      "faq.1.q": "Servono le cuffie?", "faq.1.a": "Sì. L’app si avvia solo con le cuffie collegate. Riprodurre la voce dall’altoparlante causerebbe l’effetto Larsen, e il suono ritardato deve arrivare solo alle tue orecchie.",
+      "faq.2.q": "Funzionano le cuffie Bluetooth?", "faq.2.a": "Sì, ma il Bluetooth aggiunge circa 100–250 ms di ritardo che l’app non può eliminare, quindi senti la voce più tardi rispetto al ritardo impostato. Le cuffie con filo danno i risultati più precisi.",
+      "faq.3.q": "SpeachBeach è un dispositivo medico?", "faq.3.a": "No. È uno strumento di esercizio, non un dispositivo medico. Non diagnostica, non tratta e non cura la balbuzie, e i risultati variano da persona a persona. Per una valutazione o una terapia, rivolgiti a un logopedista.",
+      "faq.4.q": "Registra la mia voce?", "faq.4.a": "No. La tua voce viene elaborata in tempo reale sul dispositivo e non viene mai registrata, salvata o inviata.",
+      "disc.t": "Nota:", "disc.b": "SpeachBeach non è un dispositivo medico e non sostituisce un logopedista. I risultati variano da persona a persona.",
+      "foot.privacy": "Informativa sulla privacy", "foot.contact": "Contatti"
+    }
+  };
+
+  var nodes = document.querySelectorAll("[data-i18n]");
+  var english = {};
+  nodes.forEach(function (el) { english[el.getAttribute("data-i18n")] = el.textContent; });
+  dict.en = english;
+
+  function apply(lang) {
+    var table = dict[lang] || english;
+    nodes.forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      el.textContent = table[key] || english[key];
+    });
+    document.documentElement.lang = lang;
+    select.value = lang;
+  }
+
+  var select = document.getElementById("lang");
+  var saved = null;
+  try { saved = localStorage.getItem("sb-lang"); } catch (e) {}
+  var browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+  var initial = dict[saved] ? saved : (dict[browser] ? browser : "en");
+  apply(initial);
+
+  select.addEventListener("change", function () {
+    apply(select.value);
+    try { localStorage.setItem("sb-lang", select.value); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

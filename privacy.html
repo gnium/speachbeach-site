@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SpeachBeach Privacy</title>
+<meta name="description" content="SpeachBeach privacy policy: your voice is processed on your device and never recorded or sent anywhere.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --ground: #F3F9FA;
+    --surface: #FFFFFF;
+    --ink: #0A2338;
+    --muted: #4B6778;
+    --line: #D3E6EB;
+    --accent: #0D57A3;
+    --chip: #E2F3F6;
+    --focus: #FFB020;
+    --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #05182A; --surface: #0A2437; --ink: #E3F2F6; --muted: #97B3C2;
+      --line: #183B52; --accent: #5FD3DF; --chip: #0F3148;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #05182A; --surface: #0A2437; --ink: #E3F2F6; --muted: #97B3C2;
+    --line: #183B52; --accent: #5FD3DF; --chip: #0F3148;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 400 1.0625rem/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+  .wrap { width: 100%; max-width: 760px; margin-inline: auto; padding-inline: 20px; }
+  header { border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 800 1.15rem/1 var(--display); }
+  .brand img { width: 32px; height: 32px; border-radius: 8px; }
+  select { font: 700 0.9rem/1 var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; }
+  main { padding-block: 56px 72px; }
+  h1 { font: 800 clamp(2rem, 5vw, 2.8rem)/1.1 var(--display); letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+  .date { font: 500 0.85rem/1.4 var(--mono); color: var(--muted); margin: 0 0 32px; }
+  .summary { background: var(--chip); border-radius: 16px; padding: 18px 22px; margin: 0 0 36px; font-weight: 700; }
+  h2 { font: 800 1.3rem/1.25 var(--display); margin: 34px 0 8px; }
+  p, li { color: var(--muted); max-width: 64ch; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 1.2em; }
+  footer { border-top: 1px solid var(--line); padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 0.95rem; }
+  footer a { color: var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> SpeachBeach</a>
+    <select id="lang" aria-label="Language">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="it">Italiano</option>
+    </select>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 data-i18n="title">Privacy policy</h1>
+  <p class="date" data-i18n="date">Effective 18 September 2026</p>
+  <p class="summary" data-i18n="summary">In short: SpeachBeach does not collect, store or share any personal data. Your voice never leaves your device.</p>
+
+  <h2 data-i18n="mic.t">Microphone</h2>
+  <p data-i18n="mic.b">SpeachBeach asks for microphone access for one purpose: to play your voice back to you through your headphones in real time, with the delay and pitch shift you choose. The app also measures the loudness of your voice on the device to drive adaptive mode.</p>
+
+  <h2 data-i18n="proc.t">On-device processing</h2>
+  <p data-i18n="proc.b">All audio is processed on your iPhone or iPad as you speak. Audio is never recorded, saved to a file or sent over the internet. When you turn feedback off, the audio is simply gone.</p>
+
+  <h2 data-i18n="none.t">What we don't do</h2>
+  <ul>
+    <li data-i18n="none.1">No analytics or usage tracking</li>
+    <li data-i18n="none.2">No advertising</li>
+    <li data-i18n="none.3">No accounts or sign-up</li>
+    <li data-i18n="none.4">No third-party SDKs</li>
+    <li data-i18n="none.5">No data sold or shared with anyone</li>
+  </ul>
+
+  <h2 data-i18n="collect.t">Data collected</h2>
+  <p data-i18n="collect.b">None. The app works offline and does not send any information to us or to third parties.</p>
+
+  <h2 data-i18n="children.t">Children</h2>
+  <p data-i18n="children.b">Because the app collects no data, it collects no data from children either.</p>
+
+  <h2 data-i18n="changes.t">Changes to this policy</h2>
+  <p data-i18n="changes.b">If this policy changes, we will update this page and its effective date.</p>
+
+  <h2 data-i18n="contact.t">Contact</h2>
+  <!-- TODO: replace with the real support address before publishing. -->
+  <p><span data-i18n="contact.b">Questions about privacy? Write to</span> <a href="mailto:hello@speachbeach.app">hello@speachbeach.app</a></p>
+</main>
+
+<footer>
+  <div class="wrap"><a href="index.html" data-i18n="back">Back to SpeachBeach</a></div>
+</footer>
+
+<script>
+(function () {
+  var dict = {
+    es: {
+      "title": "Política de privacidad", "date": "Vigente desde el 18 de septiembre de 2026",
+      "summary": "En resumen: SpeachBeach no recopila, almacena ni comparte datos personales. Tu voz nunca sale de tu dispositivo.",
+      "mic.t": "Micrófono", "mic.b": "SpeachBeach solicita acceso al micrófono con un único fin: devolverte tu voz por los auriculares en tiempo real, con el retardo y el cambio de tono que elijas. La app también mide el volumen de tu voz en el dispositivo para el modo adaptativo.",
+      "proc.t": "Procesamiento en el dispositivo", "proc.b": "Todo el audio se procesa en tu iPhone o iPad mientras hablas. Nunca se graba, no se guarda en ningún archivo y no se envía por internet. Cuando desactivas la retroalimentación, el audio simplemente desaparece.",
+      "none.t": "Lo que no hacemos", "none.1": "Sin analíticas ni seguimiento de uso", "none.2": "Sin publicidad", "none.3": "Sin cuentas ni registro", "none.4": "Sin SDK de terceros", "none.5": "No vendemos ni compartimos datos con nadie",
+      "collect.t": "Datos recopilados", "collect.b": "Ninguno. La app funciona sin conexión y no envía información ni a nosotros ni a terceros.",
+      "children.t": "Menores", "children.b": "Como la app no recopila datos, tampoco recopila datos de menores.",
+      "changes.t": "Cambios en esta política", "changes.b": "Si esta política cambia, actualizaremos esta página y su fecha de vigencia.",
+      "contact.t": "Contacto", "contact.b": "¿Preguntas sobre privacidad? Escríbenos a", "back": "Volver a SpeachBeach"
+    },
+    fr: {
+      "title": "Politique de confidentialité", "date": "En vigueur depuis le 18 septembre 2026",
+      "summary": "En bref : SpeachBeach ne collecte, ne conserve et ne partage aucune donnée personnelle. Votre voix ne quitte jamais votre appareil.",
+      "mic.t": "Microphone", "mic.b": "SpeachBeach demande l’accès au micro dans un seul but : vous renvoyer votre voix dans vos écouteurs en temps réel, avec le délai et le décalage de hauteur que vous choisissez. L’app mesure aussi le volume de votre voix sur l’appareil pour le mode adaptatif.",
+      "proc.t": "Traitement sur l’appareil", "proc.b": "Tout l’audio est traité sur votre iPhone ou iPad pendant que vous parlez. Il n’est jamais enregistré, sauvegardé dans un fichier ni envoyé sur internet. Quand vous désactivez le retour auditif, l’audio disparaît tout simplement.",
+      "none.t": "Ce que nous ne faisons pas", "none.1": "Aucune statistique ni suivi d’utilisation", "none.2": "Aucune publicité", "none.3": "Aucun compte ni inscription", "none.4": "Aucun SDK tiers", "none.5": "Aucune donnée vendue ou partagée",
+      "collect.t": "Données collectées", "collect.b": "Aucune. L’app fonctionne hors ligne et n’envoie aucune information, ni à nous ni à des tiers.",
+      "children.t": "Enfants", "children.b": "L’app ne collectant aucune donnée, elle n’en collecte pas non plus auprès des enfants.",
+      "changes.t": "Modifications", "changes.b": "Si cette politique change, nous mettrons à jour cette page et sa date d’entrée en vigueur.",
+      "contact.t": "Contact", "contact.b": "Une question sur la confidentialité ? Écrivez-nous à", "back": "Retour à SpeachBeach"
+    },
+    it: {
+      "title": "Informativa sulla privacy", "date": "In vigore dal 18 settembre 2026",
+      "summary": "In breve: SpeachBeach non raccoglie, conserva o condivide dati personali. La tua voce non lascia mai il tuo dispositivo.",
+      "mic.t": "Microfono", "mic.b": "SpeachBeach chiede l’accesso al microfono per un solo scopo: restituirti la voce in cuffia in tempo reale, con il ritardo e il cambio di tonalità che scegli. L’app misura anche il volume della voce sul dispositivo per la modalità adattiva.",
+      "proc.t": "Elaborazione sul dispositivo", "proc.b": "Tutto l’audio viene elaborato sul tuo iPhone o iPad mentre parli. Non viene mai registrato, salvato in un file o inviato via internet. Quando disattivi il feedback, l’audio semplicemente scompare.",
+      "none.t": "Cosa non facciamo", "none.1": "Nessuna analisi o tracciamento dell’uso", "none.2": "Nessuna pubblicità", "none.3": "Nessun account o registrazione", "none.4": "Nessun SDK di terze parti", "none.5": "Nessun dato venduto o condiviso",
+      "collect.t": "Dati raccolti", "collect.b": "Nessuno. L’app funziona offline e non invia informazioni né a noi né a terzi.",
+      "children.t": "Minori", "children.b": "Poiché l’app non raccoglie dati, non raccoglie nemmeno dati di minori.",
+      "changes.t": "Modifiche", "changes.b": "Se questa informativa cambia, aggiorneremo questa pagina e la sua data di entrata in vigore.",
+      "contact.t": "Contatti", "contact.b": "Domande sulla privacy? Scrivici a", "back": "Torna a SpeachBeach"
+    }
+  };
+  var nodes = document.querySelectorAll("[data-i18n]");
+  var english = {};
+  nodes.forEach(function (el) { english[el.getAttribute("data-i18n")] = el.textContent; });
+  dict.en = english;
+  var select = document.getElementById("lang");
+  function apply(lang) {
+    var table = dict[lang] || english;
+    nodes.forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      el.textContent = table[key] || english[key];
+    });
+    document.documentElement.lang = lang;
+    select.value = lang;
+  }
+  var saved = null;
+  try { saved = localStorage.getItem("sb-lang"); } catch (e) {}
+  var browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+  apply(dict[saved] ? saved : (dict[browser] ? browser : "en"));
+  select.addEventListener("change", function () {
+    apply(select.value);
+    try { localStorage.setItem("sb-lang", select.value); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
